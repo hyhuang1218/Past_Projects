@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <title>
+            Voice Search
+        </title>
+        <link rel="stylesheet" href="stylesheet.css" type="text/css"/>
+        <script src="queryProcess.js" type="text/javascript"></script>        
+    </head>
+    <body onload="parseUrl()">
+        <div id="4return"></div>
+        <header id="header" class="header" role="banner">
+            <div class="container">
+                <ul class="nav">
+                    <li class="nav_item">
+                        <div id="searchIcon"><a href="#textBar" onclick="reco.toggleStartStop()"><img id="status_img" src="images/button.png" alt="voicebutton" onmouseover="this.src='images/ButtonHover.png'" onmouseout="this.src='images/Button.png'"  height="32" width="32"/></a></div>
+                        
+                    </li>
+                    <li class="textBar">
+                         <input id="textBar" type="text" size="60" maxlength="60" value="" />
+                         
+                    </li>
+                    <li class="right_button">
+                        <a href="#" onclick="searchOnBing();"><img id="submitButton" src="images/searchButton.png" alt="searchbutton" style="width:32px; height: 32px"/></a>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        <!--Alternative queries-->
+        <div class="feature">
+            <div class="container_middle">
+                <div id="status">
+                </div> 
+                <table border=0 id="rankingList">
+                    
+                </table>
+            </div>
+        </div>
+
+<!--Begin documents iterator -->
+        <!--Search Results-->
+        <div class="container_body">
+            <table id="result">
+                <tr>
+                  <td>
+                    <a href="" class="linkBlue" id="title">Query - Definition and More from the Free Merriam-Webster</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="fontGray" id="description">a question or a request for information about something. plural queries. Full Definition of QUERY. 1. : question, inquiry. 2. : a question in the mind : doubt. 3...                
+                  </td>
+                </tr>
+                <tr>
+                  <td class="docSeparate" id="displayURL">
+                    <a href="" class="  ">www.merriam-webster.com/dictionary/query</a>
+                  </td>
+                </tr> 
+            </table>
+            <!--     End documents iterator -->                
+                 <!-- page selection -->
+            <table>
+                <tr>
+                  <td>
+                    <div class="paging" id="page_select">
+                      <a href="" class="linkBlue_page">First</a>
+                      <a href="" class="currentPage">1</a>
+                      <a href="" class="linkBlue_page">2</a>
+                      <a href="" class="linkBlue_page">3</a>
+                      <a href="" class="linkBlue_page">4</a>
+                      <a href="" class="linkBlue_page">5</a>
+                      <a href="" class="linkBlue_page">6</a>
+                      <a href="" class="linkBlue_page">next></a>
+                    </div>
+                  </td>
+                </tr>
+            </table>
+        </div>
+        <!--Homonyms List-->
+        <div class="container_reform docSeparate">
+            <table class="reform_table" id="similarList">
+                
+            </table>
+        </div>
+        <!--Relative List-->
+        <div class="container_reform docSeparate">
+            <table class="reform_table" id="relateList">                
+            </table>
+        </div>
+        
+        
+        <!--Synonym List-->  
+        <div class="container_reform">
+            <table class="reform_table" id="synonymList">
+                
+            </table>
+        </div>
+
+        <!-- corner voice button -->
+        <div class="voiceIcon">
+            <div id="changeIcon"><a href="#4return" onclick="reco.toggleStartStop()"><img id="status_img2" src="images/Button.png" onmouseover="this.src='images/ButtonHover.png'"  height="70" width="70"/></a></div>
+               
+        </div>
+
+        <script src="headroom.js" type="text/javascript"></script>
+        <script src="webspeech.js"></script>
+        <script>
+            //Speech Recognition
+            var reco = new WebSpeechRecognition();
+            reco.statusText('status');
+            reco.statusImage('status_img');
+            reco.finalResults('textBar');
+            reco.rankingList('rankingList');
+            reco.statusImage('status_img2');
+
+            reco.onEnd = function() {
+              if (reco.final_transcript != '') {
+                searchOnBing();
+              }
+            };
+        </script>
+    </body>
+</html>

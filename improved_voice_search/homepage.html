@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<link rel="stylesheet" href="stylesheet.css" />
+		<title>
+			Voice Search
+		</title>
+                <script>
+                    function searchOnBing(){
+                        var query = document.getElementById("query").textContent;
+                        window.location = "searchpage.html?" + query;
+                    }
+                </script>
+	</head>
+	<body style="background-image:url(images/background.jpg);background-position: center;">
+		<div id="container_title">
+			<h1>Speak Out Your Life</h1>
+		</div>
+		<div id="container_bigIcon">
+                    <div id="bigIcon"><a href="#" onclick="reco.toggleStartStop()" ><img id="status_img" src="images/Button.png" onmouseover="this.src='images/ButtonHover.png'" height="200" width="200" alt="mic"/></a></div>
+			
+		</div>
+		<div id="queryBar">
+			<div id="status">
+			</div><p id="query"></p>
+		</div>
+                <script src="webspeech.js"></script>
+                <script>
+
+                    var reco = new WebSpeechRecognition();
+                    reco.statusText('status');
+                    reco.statusImage('status_img');
+                    reco.finalResults('query');
+                    reco.rankingList('rankingList');
+
+                    reco.onEnd = function() {
+                      if (reco.final_transcript != '') {
+                        searchOnBing();
+                      }
+                    };
+                </script>   
+	</body>
+</html>
