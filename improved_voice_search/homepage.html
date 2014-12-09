@@ -7,12 +7,12 @@
 		<title>
 			Voice Search
 		</title>
-                <script>
-                    function searchOnBing(){
-                        var query = document.getElementById("query").textContent;
-                        window.location = "searchpage.html?" + query;
-                    }
-                </script>
+        <script>
+            function searchOnBing(){
+                var query = document.getElementById("query").textContent;
+                window.location = "searchpage.html?" + query;
+            }
+        </script>
 	</head>
 	<body style="background-image:url(images/background.jpg);background-position: center;">
 		<div id="container_title">
@@ -26,7 +26,7 @@
 			<div id="status">
 			</div><p id="query"></p>
 		</div>
-                <script src="webspeech.js"></script>
+                <script src="js/webspeech.js"></script>
                 <script>
 
                     var reco = new WebSpeechRecognition();

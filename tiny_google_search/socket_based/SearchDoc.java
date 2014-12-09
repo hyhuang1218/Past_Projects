@@ -11,10 +11,15 @@ import java.nio.channels.FileLock;
 import java.util.*;
 import java.util.Map.Entry;
 
-
+/*
+ * @author: Hanying Huang
+ * @date: 12/03/13
+ * search docs with given query
+ */
 public class SearchDoc {
 	private static final String GEN_LCK_FILE = "FileRecord.lck";
     private static FileLock genLock = null;	
+
 	public IIEntity searchKey(String MIIPath, String FileRecord, String key){
 		IIEntity II = null;
 		try{
@@ -28,8 +33,8 @@ public class SearchDoc {
 	        	//term found
 	        	if(termII[0].equals(key)){
 	        		//reconstruct the IIEntity
-	        		II=new IIEntity(key);
-	        		II=IIEntity.parseIIEntity(s);
+	        		II = new IIEntity(key);
+	        		II = IIEntity.parseIIEntity(s);
 	        		//System.out.println(s);
 	        	}
 	        		
@@ -44,21 +49,27 @@ public class SearchDoc {
         }
 		return II;
 	}
+	/**
+    *calculate the ranking score for all documents which contains the term(one) and store the score into a temp file
+    *@param IIEntity II
+    *@param int n
+    *@param String tempFileName
+    *@return String tempFile
+    */
 	public String newRaR(IIEntity II,  int n, String tempFileName){
-		String tempFile=null;
-		List<DocCount> docList=II.getDocCount();
+		String tempFile = null;
+		List<DocCount> docList = II.getDocCount();
 		StringBuffer sb = new StringBuffer();
-		for(int i=0;i<docList.size();i++){
-			int docID=docList.get(i).getDocID();
-			int count=docList.get(i).getCount();
-			double rar=count*2*((double)1/n);
+		for(int i = 0; i < docList.size(); i++){
+			int docID = docList.get(i).getDocID();
+			int count = docList.get(i).getCount();
+			double rar = count * 2 * ((double)1 / n);
 			sb.append(docID+","+rar+"/");			
 		}
 		
 		try{								   			
-			tempFile=tempFileName+".txt";
-			BufferedWriter output = new BufferedWriter
-            		(new FileWriter(tempFile));
+			tempFile = tempFileName+".txt";
+			BufferedWriter output = new BufferedWriter(new FileWriter(tempFile));
 			System.out.println("create temp file "+tempFile+" for keyword:"+II.getTerm());
 			output.write(sb.toString());
 			output.close();
@@ -70,103 +81,19 @@ public class SearchDoc {
 	
 		return tempFile;
 	}
-	/*public String[] RaR(Map<String,Map<Integer,Integer>> IIMap,String[] searchKeys){
-		List<DocRank> docList=new ArrayList<DocRank>();
-		Map<Integer, Double> docRank=new HashMap<Integer,Double>();
-		Map<Integer, Integer> docCount=new HashMap<Integer,Integer>();
-		
-		
-		//find the docs satisfy all search keys
-		for(int i=0;i<searchKeys.length;i++){
-			if(IIMap.get(searchKeys[i])==null){
-				//System.out.println(searchKeys[i]);
-				System.out.println("No Doc");
-				return null;
-			}
-			else if(i==0){ //basic of docRank
-				docCount=IIMap.get(searchKeys[i]);
-				Iterator<Entry<Integer, Integer>> iter = docCount.entrySet().iterator();
-			    while (iter.hasNext()) {
-				    Map.Entry<Integer, Integer> entry = (Map.Entry<Integer, Integer>) iter.next();
-				    int id = entry.getKey();
-				    double count = (double)entry.getValue();
-				   
-				    docRank.put(id, count*2*(1/(i+1)));
-				   // System.out.println("first:"+id+"  "+count*2*(1/(i+1)));
-				   
-			    }
-			}
-			else{
-				Iterator<Entry<Integer, Double>> iter = docRank.entrySet().iterator();
-				docCount=IIMap.get(searchKeys[i]);
-				List<Integer> needRemove=new ArrayList<Integer>();
-			    while (iter.hasNext()) {
-				    Map.Entry<Integer, Double> entry = (Map.Entry<Integer, Double>) iter.next();
-				    int id = entry.getKey();
-				    //double rank = (double)entry.getValue();
-				    if(docCount.get(id)==null){
-				    	needRemove.add(id);				    	
-				    	
-				    }else{
-				    	double newcount=docCount.get(id).doubleValue();
-				    	double prerank=docRank.get(id).doubleValue();
-				    	double newrank=prerank+newcount*2*((double)1/(i+1));
-				    	docRank.put(id,newrank );
-				    	//System.out.println(newrank);
-				    }
-				    //System.out.println("iterator"+id+"  "+rank);
-				    
-			    }
-			    if(!needRemove.isEmpty()){
-			    	for(int n=0;n<needRemove.size();n++){
-			    		docRank.remove(needRemove.get(n));
-			    	}
-			    	if(docRank.isEmpty())
-			    		return null;	
-			    }
-			    
-		    	
-			    //System.out.println(docRank.toString());
-				
-				//Iterator<Entry<Integer, Integer>> iter = docCount.entrySet().iterator();
-			  
-				
-			}
-			
-		}
-		//map>list,get doc name
-		Iterator<Entry<Integer, Double>> iter = docRank.entrySet().iterator();
-	    while (iter.hasNext()) {
-		    Map.Entry<Integer, Double> entry = (Map.Entry<Integer, Double>) iter.next();
-		    int id = entry.getKey();
-		    double rank = (double)entry.getValue();
-		    //System.out.println("iterator"+id+"  "+rank);
-		    DocRank dr=new DocRank(id,rank);
-		    docList.add(dr);
-	    }
-	    if(docList!=null){
-		    SearchDoc search=new SearchDoc();
-		    String[] docName=search.getDocName(docList);
-	        return docName;
-        }
-	    
-		return null;
-	   
-	}*/
 	
 	public String[] getDocNameByRaRFile(String pathName){
 		FileOutputStream fo = null;
-		OperateFile of=new OperateFile();
-		Map<Integer,Double> totalRank=of.parseRaRFile(pathName);
-		List<DocRank> docList=new ArrayList<DocRank>();
-		//map>list  
+		OperateFile of = new OperateFile();
+		Map<Integer,Double> totalRank = of.parseRaRFile(pathName);
+		List<DocRank> docList = new ArrayList<DocRank>();
 		Iterator<Entry<Integer, Double>> iter = totalRank.entrySet().iterator();
 	    while (iter.hasNext()) {
 		    Map.Entry<Integer, Double> entry = (Map.Entry<Integer, Double>) iter.next();
 		    int id = entry.getKey();
 		    double rank = (double)entry.getValue();
 		    //System.out.println("iterator"+id+"  "+rank);
-		    DocRank dr=new DocRank(id,rank);
+		    DocRank dr = new DocRank(id,rank);
 		    docList.add(dr);
 	    }
 	    //sort list
@@ -174,26 +101,26 @@ public class SearchDoc {
 		System.out.println("Sorted Rank:"+docList.toString());
 		
 		String s = null;
-		String[] docName=new String[docList.size()];		
+		String[] docName = new String[docList.size()];		
 		try {
             // Acquire an exclusive lock, assure manager is stand alone
-			fo=new FileOutputStream(GEN_LCK_FILE);
+			fo = new FileOutputStream(GEN_LCK_FILE);
 			
 			System.out.println("Request for the lock...");
-            while(null==(genLock=fo.getChannel().tryLock())){
+            while(null == (genLock = fo.getChannel().tryLock())){
             	;//wait until get lock
             }
 		
         	BufferedReader br2 = new BufferedReader(new FileReader(ServerInfo.FileRecord));  
             
     	    
-			while((s = br2.readLine())!=null){
+			while((s = br2.readLine()) != null){
 				
-				String[] record=s.split(",");
-				for(int i=0;i<docList.size();i++){
-			    	if(Integer.parseInt(record[0])==(docList.get(i).getDocID())){
+				String[] record = s.split(",");
+				for(int i = 0;i < docList.size();i++){
+			    	if(Integer.parseInt(record[0]) == (docList.get(i).getDocID())){
 			    		//System.out.println(record[1]);
-			    		docName[i]=record[1];
+			    		docName[i] = record[1];
 			    	}
 				}
 			}
@@ -214,8 +141,6 @@ public class SearchDoc {
                 }
             }
         }
-		//File temp=new File(pathName);
-		//temp.delete();
 		
 		return docName;
 	}

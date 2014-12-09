@@ -31,16 +31,16 @@ public class LineIndexer {
         OutputCollector<Text, Text> output, Reporter reporter)
         throws IOException {
 
-      FileSplit fileSplit = (FileSplit)reporter.getInputSplit();
-      String fileName = fileSplit.getPath().getName(); //get the file name
-      location.set(fileName);
+        FileSplit fileSplit = (FileSplit)reporter.getInputSplit();
+        String fileName = fileSplit.getPath().getName(); //get the file name
+        location.set(fileName);
 
-      String line = val.toString();
-      StringTokenizer itr = new StringTokenizer(line.toLowerCase()," \t\b\r%1234567890\"\'()*;:~{}_+&^@/[]#$=-?,.!\n");
-      while (itr.hasMoreTokens()) {
-        word.set(itr.nextToken());
-        output.collect(word, location); //for each occurrence of a word, key: word  value: file name
-      }
+        String line = val.toString();
+        StringTokenizer itr = new StringTokenizer(line.toLowerCase()," \t\b\r%1234567890\"\'()*;:~{}_+&^@/[]#$=-?,.!\n");
+        while (itr.hasMoreTokens()) {
+            word.set(itr.nextToken());
+            output.collect(word, location); //for each occurrence of a word, key: word  value: file name
+        }
     }
   }
 
@@ -53,27 +53,28 @@ public class LineIndexer {
         OutputCollector<Text, Text> output, Reporter reporter)
         throws IOException {
 
-      boolean first = true;
-      StringBuilder toReturn = new StringBuilder();
-      int count=0;
-      String current="";
-      Map<String, Integer> docCount=new HashMap<String,Integer>();
-      while (values.hasNext()){
-    	  current=values.next().toString();
-    	  if(!(docCount.containsKey(current)))  //the first occurrence of the key(word) in an document
+        boolean first = true;
+        StringBuilder toReturn = new StringBuilder();
+        int count = 0;
+        String current = "";
+        Map<String, Integer> docCount = new HashMap<String,Integer>();
+        while (values.hasNext()) {
+    	  current = values.next().toString();
+          if(!(docCount.containsKey(current))) { //the first occurrence of the key(word) in an document
     		  docCount.put(current, 1);
-    	  else if(docCount.containsKey(current)){ //not the first occurrence, increasing count
+          } else if(docCount.containsKey(current)) { //not the first occurrence, increasing count
     		  docCount.put(current, docCount.get(current).intValue()+1);
     	  }
-      }
-      Iterator<Entry<String, Integer>> iter = docCount.entrySet().iterator();
-	    while (iter.hasNext()) { //generate output value from the Map: docName=>count,docName=>count
+        }
+            
+        Iterator<Entry<String, Integer>> iter = docCount.entrySet().iterator();
+        while (iter.hasNext()) { //generate output value from the Map: docName=>count,docName=>count
 		    Map.Entry<String, Integer> entry = (Map.Entry<String, Integer>) iter.next();
 		    Object mapkey = entry.getKey();
 		    Object val = entry.getValue();
-		    toReturn.append(mapkey.toString()+"=>"+val.toString()+",");
+		    toReturn.append(mapkey.toString() + "=>" + val.toString() + ",");
 	    }
-      output.collect(key, new Text(toReturn.toString())); //for each word, key: word value: document list with payload
+        output.collect(key, new Text(toReturn.toString())); //for each word, key: word value: document list with payload
     }
   }
 
@@ -83,26 +84,26 @@ public class LineIndexer {
    * "driver" for the MapReduce job.
    */
   public static void main(String[] args) {
-    JobClient client = new JobClient();
-    JobConf conf = new JobConf(LineIndexer.class);
+      JobClient client = new JobClient();
+      JobConf conf = new JobConf(LineIndexer.class);
 
-    conf.setJobName("LineIndexer");
+      conf.setJobName("LineIndexer");
+      
+      conf.setOutputKeyClass(Text.class);
+      conf.setOutputValueClass(Text.class);
 
-    conf.setOutputKeyClass(Text.class);
-    conf.setOutputValueClass(Text.class);
+      FileInputFormat.addInputPath(conf, new Path(args[0]));
+      FileOutputFormat.setOutputPath(conf, new Path(args[1]));
 
-    FileInputFormat.addInputPath(conf, new Path(args[0]));
-    FileOutputFormat.setOutputPath(conf, new Path(args[1]));
+      conf.setMapperClass(LineIndexMapper.class);
+      conf.setReducerClass(LineIndexReducer.class);
 
-    conf.setMapperClass(LineIndexMapper.class);
-    conf.setReducerClass(LineIndexReducer.class);
+      client.setConf(conf);
 
-    client.setConf(conf);
-
-    try {
-      JobClient.runJob(conf);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+      try {
+        JobClient.runJob(conf);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
   }
 }

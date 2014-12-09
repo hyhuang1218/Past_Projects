@@ -10,7 +10,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 /*
- * @author: Song Jin
+ * @author: Hanying Huang
  * @date: 12/04/13
  * helper thread in single machine
  */
@@ -90,7 +90,7 @@ public class Helper extends Thread {
 		int index = 0;
 		int count = 0;
 		while (index < input.length()) {
-			if (input.charAt(index)=='|') {
+			if (input.charAt(index) == '|') {
 				count++;
 			}
 			index++;
@@ -102,7 +102,7 @@ public class Helper extends Thread {
 		int index = 0;
 		int count = 0;
 		while (index < input.length()) {
-			if (input.charAt(index)=='^') {
+			if (input.charAt(index) == '^') {
 				count++;
 			}
 			index++;
@@ -247,7 +247,7 @@ public class Helper extends Thread {
 					reqType = element.getType();
 					request = element.getReqContent();
 					
-					if (reqType=='1') {
+					if (reqType == '1') {
 						System.out.println("Got indexing document request: "+request);
 						
 						/*** use request handle API ***/
@@ -257,10 +257,10 @@ public class Helper extends Thread {
 							tempList.add(tempFile);
 						}
 						System.out.println("&&&"+tempList+"&&&");
-					} else if (reqType=='2') {
+					} else if (reqType == '2') {
 						tempFile = QueryProcess.startSearch(request, "");
 						System.out.println("Return search result temporary file: "+tempFile);
-						if(tempFile!=null){
+						if(tempFile != null){
 							tempSearchList.add(tempFile);
 						} else {
 							nullFlag = true;

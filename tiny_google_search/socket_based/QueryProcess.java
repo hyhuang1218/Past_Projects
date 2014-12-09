@@ -7,39 +7,42 @@ import java.io.IOException;
 import java.nio.channels.FileLock;
 import java.util.List;
 
-
-
+/*
+ * @author: Hanying Huang
+ * @date: 11/30/13
+ * nvoke the corresponding functions based on the query: index, or search
+ */
 public class QueryProcess {
 	
 	private static final String GEN_LCK_FILE = "FileRecord.lck";
     private static FileLock genLock = null;
-	public static String startIndex(String pathName, String threadID){ //return word count list
 
-		String tempFile=null;
-		OperateFile operate=new OperateFile();
+	public static String startIndex(String pathName, String threadID){ //return word count list
+		String tempFile = null;
+		OperateFile operate = new OperateFile();
 		FileOutputStream fo = null;
-		int fileID=1;
-		IndexDoc count=new IndexDoc();		
+		int fileID = 1;
+		IndexDoc count = new IndexDoc();		
 		//read previous file record-check whether it has been indexed before or not	
-		int rs=1;
+		int rs = 1;
 		try {
             // Acquire an exclusive lock, assure manager is stand alone
-			fo=new FileOutputStream(GEN_LCK_FILE);
+			fo = new FileOutputStream(GEN_LCK_FILE);
 			
 			System.out.println("Request for the lock...");
-            while(null==(genLock=fo.getChannel().tryLock())){
+            while(null == (genLock = fo.getChannel().tryLock())){
             	;//wait until get lock
             }
 
             if (null != genLock) {
-            	File temp=new File(ServerInfo.FileRecord);
+            	File temp = new File(ServerInfo.FileRecord);
             	if(temp.exists()){
             		//System.out.println(temp.exists());
             		
-            		if((rs=count.hasIndexed(pathName))==0)
+            		if((rs = count.hasIndexed(pathName)) == 0)
             			;//has indexed
             		else{//not indexed
-            			fileID=rs;
+            			fileID = rs;
             			count.recordFile(fileID, pathName);
             		}
             	}
@@ -64,10 +67,10 @@ public class QueryProcess {
             }
         }
     	
-    	if(rs!=0){//need to index				
+    	if(rs != 0){//need to index				
 			//word count for one document/one segment   generate one tempfile
-			List<String> parts=operate.splitDocByLine(pathName);			
-			tempFile=count.countFile(parts,0,parts.size(),fileID,"tempII"+fileID);
+			List<String> parts = operate.splitDocByLine(pathName);			
+			tempFile = count.countFile(parts,0,parts.size(),fileID,"tempII"+fileID);
 			//record file
 						
     	}
@@ -77,24 +80,24 @@ public class QueryProcess {
 	}
 		
 	public static String startSearch(String searchquery, String threadID){
-		SearchDoc search=new SearchDoc();
-		String[] searchKey=searchquery.split("@");
+		SearchDoc search = new SearchDoc();
+		String[] searchKey = searchquery.split("@");
 		String tempFile;
 		//StringBuffer sb = new StringBuffer();
 		
-		IIEntity II=new IIEntity(searchKey[0]);
+		IIEntity II = new IIEntity(searchKey[0]);
 		
 			//System.out.println("For key "+searchKeys[i]);	
-		File temp=new File(ServerInfo.FileRecord);
+		File temp = new File(ServerInfo.FileRecord);
 		if(!temp.exists())
-			tempFile=null;
-		II=search.searchKey(ServerInfo.MIIPath, 
+			tempFile = null;
+		II = search.searchKey(ServerInfo.MIIPath, 
 				ServerInfo.FileRecord,searchKey[0]);
-		if(II==null){
-			tempFile=null;
+		if(II == null){
+			tempFile = null;
 		}
 		else{
-			tempFile=search.newRaR(II, Integer.parseInt(searchKey[1]), "tempRar"+searchKey[1]);
+			tempFile = search.newRaR(II, Integer.parseInt(searchKey[1]), "tempRar"+searchKey[1]);
 		}
 		//return temp file path
 		return tempFile;
